@@ -27,23 +27,38 @@ def Data(Name):
     # -------------------------------------------------- #
     # insert the Tables
     Data = NormData(Zeilen)
+    pdf.write(10, txt='berechne Absatzsynchron')
+    pdf.write(10, txt='\n')
     pdf = DruckTablle(table_spacing, pdf,table_border, Data)
-    pdf.write(10, txt='\n\n')
+    pdf.write(10, txt='\n')
 
-    pdf.write(10, txt='Absatzsynchron')
+    pdf.write(10, txt='berechne mit dem Ziellagerbestand')
+    pdf.write(10, txt='\n')
+    pdf = DruckTablle(table_spacing, pdf,table_border, Data)
+    pdf.write(10, txt='\n')
+
+    pdf.write(10, txt='berechte mit der Zielreichweite')
+    pdf.write(10, txt='\n')
+    pdf = DruckTablle(table_spacing, pdf,table_border, Data)
+    pdf.write(10, txt='\n')
+
+
+
+    pdf.add_page()
+    pdf.write(10, txt='Lösung: Absatzsynchron')
     pdf.write(10, txt='\n')
     pdf = DruckTablle(table_spacing, pdf,table_border,PrüfDatenAbsatzsynchron(Data))
-    pdf.write(10, txt='\n\n')
+    pdf.write(10, txt='\n')
 
-    pdf.write(10, txt='Ziellagerbestand')
+    pdf.write(10, txt='Lösung: Ziellagerbestand')
     pdf.write(10, txt='\n')
     pdf = DruckTablle(table_spacing, pdf,table_border,PrüfDatenZiellagerbestand(Data))
-    pdf.write(10, txt='\n\n')
+    pdf.write(10, txt='\n')
 
-    pdf.write(10, txt='Zielreichweite')
+    pdf.write(10, txt='Lösung: Zielreichweite')
     pdf.write(10, txt='\n')
     pdf = DruckTablle(table_spacing, pdf,table_border,PrüfDatenZielreichweite(Data))
-    pdf.write(10, txt='\n\n')
+    pdf.write(10, txt='\n')
 
     # -------------------------------------------------- #
     # output of PDF
@@ -53,7 +68,7 @@ def Data(Name):
     return data
 
 def DruckTablle(table_spacing, pdf, table_border, data):
-    col_width = pdf.w / 4.5
+    col_width = pdf.w / 9
     row_height = pdf.font_size
     for row in data:
         for cell in row:
@@ -86,42 +101,76 @@ def NormData(Zeilen):
     data.append(['Zielreichweite'])
     for i in range(Zeilen):
         data[4].append(str(random.randint(5,30)))
-    # -------------------------------------------------------------------------------- # 
+    # -------------------------------------------------------------------------------- #
+    # Lagerbestand "        "
+    data.append(['Lagerbestand'])
+    for i in range(Zeilen):
+        data[5].append("            ")
+
+
     return data
 
 # Absatz = 1
 # Produktion = 2
 # Ziellagerbestand = 3
 # Zielreichweite = 4
+# Lagerbestand = 5
 
 def PrüfDatenAbsatzsynchron(data):
     data[2] = ['Produktion']
     # Zeile 2
     # Absatzsynchron Produktion = Absatz
-    for i in range(1,6):
+    for i in range(1,7):
         data[2].append(data[1][i])
 
     return data
 
 def PrüfDatenZielreichweite(data):
     data[2] = ['Produktion']
+
+    data[5] = ['Lagerbestand']
     # Zeile 2
-    # Absatzsynchron Produktion = Absatz * Zielreichweite/Arbeitstage + Absatzmenge - Lagerbestand
-    for i in range(1,6):
-        # TODO: FORMEL
-        temp = 0
-        data[2].append(temp)
+    # Absatzsynchron Produktion = Absatz * Zielreichweite/Arbeitstage + Absatz - Lagerbestand
+    for i in range(1,7):
+        Absatz = int(data[1][i])
+        Zielreichweite = int(data[4][i])
+        Arbeitstage = 20
+        if (i == 1):
+            Lagerbestand = 0
+        else:
+            Lagerbestand = float(data[5][i-1])
+            Lagerbestand = int(Lagerbestand)
+
+        temp = (Absatz * Zielreichweite / Arbeitstage + Absatz - Lagerbestand) / 1
+        temp = int(temp)
+        data[2].append(str(temp))
+
+        temp2 = (temp - Absatz) / 1
+        data[5].append(str(temp2))
 
     return data
 
 def PrüfDatenZiellagerbestand(data):
     data[2] = ['Produktion']
+
+    data[5] = ['Lagerbestand']
     # Zeile 2
     # Ziellagerbestand Produktion = Absatz-Lagerbestand + Ziellagerbestand
-    for i in range(1,6):
-        # TODO: FORMEL
-        temp = 0
-        data[2].append(temp)
+    for i in range(1,7):
+        Absatz = int(data[1][i])
+        if (i == 1):
+            Lagerbestand = 0
+        else:
+            Lagerbestand = float(data[5][i - 1])
+            Lagerbestand = int(Lagerbestand)
+
+        Ziellagerbestand = int(data[3][i])
+
+        temp = (Absatz - Lagerbestand + Ziellagerbestand) / 1
+        data[2].append(str(temp))
+
+        temp2 = Ziellagerbestand
+        data[5].append(str(temp2))
 
     return data
     
