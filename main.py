@@ -7,11 +7,11 @@ import random
 def Data(Name):
     # FONTS
     font = 'Times'
-    fontSize = 10
+    fontSize = 8
 
     # Table
-    table_border = 4
-    table_spacing = 3
+    table_border = 1
+    table_spacing = 2
 
     Zeilen = 6
 
@@ -27,19 +27,23 @@ def Data(Name):
     # -------------------------------------------------- #
     # insert the Tables
     Data = NormData(Zeilen)
-    pdf = DruckTablle(pdf,table_border, Data)
+    pdf = DruckTablle(table_spacing, pdf,table_border, Data)
+    pdf.write(10, txt='\n\n')
 
     pdf.write(10, txt='Absatzsynchron')
+    pdf.write(10, txt='\n')
+    pdf = DruckTablle(table_spacing, pdf,table_border,PrüfDatenAbsatzsynchron(Data))
     pdf.write(10, txt='\n\n')
-    pdf = DruckTablle(pdf,table_border,PrüfDatenAbsatzsynchron(Data))
 
     pdf.write(10, txt='Ziellagerbestand')
+    pdf.write(10, txt='\n')
+    pdf = DruckTablle(table_spacing, pdf,table_border,PrüfDatenZiellagerbestand(Data))
     pdf.write(10, txt='\n\n')
-    pdf = DruckTablle(pdf,table_border,PrüfDatenZiellagerbestand(Data))
 
     pdf.write(10, txt='Zielreichweite')
+    pdf.write(10, txt='\n')
+    pdf = DruckTablle(table_spacing, pdf,table_border,PrüfDatenZielreichweite(Data))
     pdf.write(10, txt='\n\n')
-    pdf = DruckTablle(pdf,table_border,PrüfDatenZielreichweite(Data))
 
     # -------------------------------------------------- #
     # output of PDF
@@ -48,13 +52,12 @@ def Data(Name):
 
     return data
 
-def DruckTablle(pdf, table_border, data):
+def DruckTablle(table_spacing, pdf, table_border, data):
     col_width = pdf.w / 4.5
     row_height = pdf.font_size
-    table_spacing = table_spacing
     for row in data:
         for cell in row:
-            pdf.cell(col_width, row_height*table_spacing, txt=cell, border=table_border)
+            pdf.cell(col_width, row_height*table_spacing, txt=str(cell), border=table_border)
         pdf.ln(row_height*table_spacing)
     return pdf
 
@@ -132,6 +135,7 @@ def PrüfDatenZiellagerbestand(data):
 
 if __name__ == "__main__":
     Name = 'Test'
+    Data(Name)    
     
 
 
